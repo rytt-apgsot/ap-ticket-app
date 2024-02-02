@@ -1,24 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import { baseTheme } from "./theme";
 
 function App() {
+  const storedData = localStorage.getItem("user");
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={baseTheme}>
+      <CssBaseline />
+      <Router>
+        <Routes>
+          {storedData ? (
+            <Route path="/" element={<Navigate to="/home" />} />
+          ) : (
+            <Route path="/" element={<Login />} />
+          )}
+          <Route path="/" element={<Login />} />
+          <Route path="/home" element={<Home />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 
