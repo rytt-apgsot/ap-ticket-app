@@ -21,7 +21,7 @@ const ListCase = () => {
     try {
       axios
         .get(
-          `https://test-strapi.rytt.com/api/cases?populate=*&filters[leads][id][$eq]=${userData[0].id}&sort=createdAt:desc`
+          `https://test-strapi.rytt.com/api/cases?populate=*&filters[leads][id][$eq]=${userData?.[0]?.id}&sort=createdAt:desc`
         )
         .then(function (response) {
           setListCase(response?.data?.data);

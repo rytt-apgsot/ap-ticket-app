@@ -34,8 +34,6 @@ export default function CreateCase({ formData }) {
 
   const userData = JSON.parse(storedData);
 
-  console.log(userData[0].id);
-
   const handleClickOpen = () => {
     setOpen(true);
   };

@@ -83,7 +83,17 @@ export default function ChatDetail({ data }) {
     return () => clearInterval(intervalId);
   }, [data]);
 
-  console.log(listChat);
+  // console.log(listChat?.[0]?.attributes?.messages);
+
+  const modifiedArray = listChat?.[0]?.attributes?.messages?.map((item) => ({
+    ...item,
+    media_file:
+      item.media_file?.data?.map((file) => ({
+        id: file.id,
+      })) || [],
+  }));
+
+  console.log(modifiedArray);
 
   const onSubmit = async (values, { resetForm }) => {
     console.log(values);
@@ -91,11 +101,11 @@ export default function ChatDetail({ data }) {
     const isoString = now.toISOString();
 
     axios.put(
-      `https://test-strapi.rytt.com/api/chat-finals/${listChat[0].id}`,
+      `https://test-strapi.rytt.com/api/chat-finals/${listChat[0]?.id}`,
       {
         data: {
           messages: [
-            ...listChat[0].attributes.messages,
+            ...modifiedArray,
             {
               messages: values.message,
               lead: listChat[0].attributes.lead.data.attributes.name,
@@ -140,7 +150,7 @@ export default function ChatDetail({ data }) {
         }}
       >
         {listChat &&
-          listChat[0]?.attributes?.messages
+          listChat?.[0]?.attributes?.messages
             ?.slice() // Create a copy of the array
             .reverse()
             .map((data) => (
