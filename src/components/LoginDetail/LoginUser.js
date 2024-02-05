@@ -134,7 +134,7 @@ const LoginUser = () => {
       if (validate) {
         const stringifiedData = JSON.stringify(enrollmentData);
 
-        localStorage.setItem("user", stringifiedData);
+        localStorage.setItem("user_student", stringifiedData);
         navigate("/home");
 
         console.log("Login");

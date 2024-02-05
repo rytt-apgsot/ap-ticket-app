@@ -28,7 +28,13 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 export default function CreateCase({ formData }) {
+  const storedData = localStorage.getItem("user_student");
+
   const [open, setOpen] = React.useState(false);
+
+  const userData = JSON.parse(storedData);
+
+  console.log(userData[0].id);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -94,11 +100,14 @@ export default function CreateCase({ formData }) {
 
   const onSubmit = async (values, { setSubmitting }) => {
     console.log(values);
+    const now = new Date();
+    const isoString = now.toISOString();
 
     const formData = new FormData();
-    formData.append("files", values.file);
 
-    console.log(formData);
+    values.file.forEach((file) => {
+      formData.append("files", file);
+    });
 
     try {
       if (values.file) {
@@ -116,14 +125,43 @@ export default function CreateCase({ formData }) {
 
         if (response.data) {
           try {
-            await axios.post(`https://test-strapi.rytt.com/api/cases`, {
-              data: {
-                ...values,
-                Subject: values.issue_type + "-queries",
-                media: response.data.map((data) => ({ id: data.id })),
-              },
-            });
+            await axios
+              .post(`https://test-strapi.rytt.com/api/cases`, {
+                data: {
+                  ...values,
+                  Subject: values.issue_type + "-queries",
+                  media: response.data.map((data) => ({ id: data.id })),
+                  leads: {
+                    id: userData[0].id,
+                  },
+                },
+              })
+              .then(function (responseCase) {
+                axios.post(`https://test-strapi.rytt.com/api/chat-finals`, {
+                  data: {
+                    lead: [
+                      {
+                        id: userData[0].id,
+                      },
+                    ],
+                    messages: [
+                      {
+                        messages: responseCase.data.data.attributes.Description,
+                        lead: userData[0].attributes.name,
+                        timestamp: isoString,
+                        media_file: response.data.map((data) => ({
+                          id: data.id,
+                        })),
+                      },
+                    ],
+                    case: {
+                      id: responseCase.data.data.id,
+                    },
+                  },
+                });
+              });
             console.log("Response:", response.data);
+            handleClose();
           } catch (error) {
             console.log(error);
           } finally {
@@ -132,13 +170,41 @@ export default function CreateCase({ formData }) {
         }
       } else {
         try {
-          await axios.post(`https://test-strapi.rytt.com/api/cases`, {
-            data: {
-              ...values,
-              Subject: values.issue_type + "-queries",
-            },
-          });
+          await axios
+            .post(`https://test-strapi.rytt.com/api/cases`, {
+              data: {
+                ...values,
+                Subject: values.issue_type + "-queries",
+                leads: [
+                  {
+                    id: userData[0].id,
+                  },
+                ],
+              },
+            })
+            .then(function (responseCase) {
+              axios.post(`https://test-strapi.rytt.com/api/chat-finals`, {
+                data: {
+                  lead: [
+                    {
+                      id: userData[0].id,
+                    },
+                  ],
+                  messages: [
+                    {
+                      messages: responseCase.data.data.attributes.Description,
+                      lead: userData[0].attributes.name,
+                      timestamp: isoString,
+                    },
+                  ],
+                  case: {
+                    id: responseCase.data.data.id,
+                  },
+                },
+              });
+            });
           console.log("Response: Successfuly");
+          handleClose();
         } catch (error) {
           console.log(error);
         } finally {
@@ -149,24 +215,6 @@ export default function CreateCase({ formData }) {
       console.error("Upload failed:", error);
       console.log("Error details:", error.response); // Log more details about the error
     }
-
-    // try {
-    //   const response = await axios.post(
-    //     `https://test-strapi.rytt.com/api/cases`,
-    //     {
-    //       data: {
-    //         ...values,
-    //         Subject: values.issue_type + "-queries",
-    //         media: [{ id: 22 }],
-    //       },
-    //     }
-    //   );
-    //   console.log("Response:", response.data);
-    // } catch (error) {
-    //   console.log(error);
-    // } finally {
-    //   setSubmitting(false);
-    // }
   };
 
   return (

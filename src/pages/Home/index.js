@@ -1,6 +1,7 @@
 import { Container } from "@mui/material";
 import CreateCase from "../../components/CreateCase/CreateCase";
 import Dashboard from "../../components/Dashboard/Dashboard";
+import ListCase from "../ListCase";
 
 const Home = () => {
   const formData = [
@@ -313,8 +314,9 @@ const Home = () => {
   return (
     <>
       <Dashboard />
-      <Container maxWidth="false">
+      <Container>
         <CreateCase formData={formData} />
+        <ListCase />
       </Container>
     </>
   );

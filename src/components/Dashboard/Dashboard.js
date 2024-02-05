@@ -10,7 +10,7 @@ import * as React from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
-  const storedData = localStorage.getItem("user");
+  const storedData = localStorage.getItem("user_student");
   const userData = JSON.parse(storedData);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -36,7 +36,7 @@ export default function Dashboard() {
             Asmita Patel
           </Typography>
           <Typography sx={{ mr: 3 }}>
-            Hi, {userData[0]?.attributes.name}
+            Hi, {userData?.[0]?.attributes?.name}
           </Typography>
           <IconButton
             onClick={handleClick}
