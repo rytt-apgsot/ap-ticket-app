@@ -1,4 +1,4 @@
-import { Grid, TextField, Typography } from "@mui/material";
+import { Box, Grid, TextField, Typography } from "@mui/material";
 import { useField, useFormikContext } from "formik";
 import React, { useState } from "react";
 import ReactFlagsSelect from "react-flags-select";
@@ -19,45 +19,46 @@ function FormikNewPhoneNumber({
 
   const formatPhoneNumber = (input) => {
     const numericValue = input.replace(/[^0-9]/g, "");
-    if (numericValue.length <= 10) {
-      const formattedValue = numericValue.replace(/(\d{5})(\d{1,5})/, "$1-$2");
+
+    const maxLength = 10;
+
+    if (numericValue.length <= maxLength) {
+      // Add a hyphen after every 5 digits
+      const formattedValue = numericValue;
       return formattedValue;
     }
-    return numericValue.slice(0, 10); // Limit to 10 digits
+
+    return numericValue.slice(0, maxLength);
   };
 
   return (
     <>
-      <Grid container spacing={2}>
-        <Grid item xs={4}>
-          <ReactFlagsSelect
-            searchable
-            selected={selected}
-            onSelect={(code) => setSelected(code)}
-            showSecondaryOptionLabel={true}
-            showSelectedLabel={false}
-            showOptionLabel={false}
-            size="small"
-            customLabels={contry}
-            className="custom-flags-select"
-          />
+      <Grid container spacing={1}>
+        <Grid item xs={3}>
+          <Box sx={{ position: "absolute", width: "5.5%" }}>
+            <ReactFlagsSelect
+              selected={selected}
+              onSelect={(code) => setSelected(code)}
+              showSecondaryOptionLabel={true}
+              showSelectedLabel={false}
+              showOptionLabel={false}
+              size="small"
+              customLabels={contry}
+              className="custom-flags-select"
+            />
+          </Box>
         </Grid>
-        <Grid item xs={8}>
+        <Grid item xs={9}>
           <TextField
             name={name}
             label={label}
             type={type}
+            fullWidth
             value={value || ""}
             onChange={(e) => {
-              if (type === "file") {
-                setValue(e.currentTarget.files[0]);
-              } else {
-                const numericValue = formatPhoneNumber(e.target.value);
-                if (numericValue.length <= 11) {
-                  setValue(numericValue);
-                }
-                onFormData(foundCode.secondary, numericValue);
-              }
+              const numericValue = formatPhoneNumber(e.target.value);
+              setValue(numericValue);
+              onFormData(foundCode.secondary, numericValue.replace("-", "")); // Remove hyphen before passing to onFormData
             }}
             onBlur={handleBlur}
             error={error && touched}
@@ -77,4 +78,5 @@ function FormikNewPhoneNumber({
     </>
   );
 }
+
 export default FormikNewPhoneNumber;

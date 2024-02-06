@@ -167,6 +167,7 @@ export default function ChatDetail({ data }) {
                         marginBottom: 2,
                         borderRadius: "5px",
                         position: "relative",
+                        wordWrap: "break-word",
                       }}
                     >
                       {/* Previous messages extending towards the left */}
@@ -231,6 +232,7 @@ export default function ChatDetail({ data }) {
                         marginBottom: 2,
                         borderRadius: "5px",
                         position: "relative",
+                        wordWrap: "break-word",
                       }}
                     >
                       {/* Latest message at the right side */}

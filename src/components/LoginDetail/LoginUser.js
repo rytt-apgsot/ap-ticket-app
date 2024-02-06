@@ -1,26 +1,41 @@
+import FingerprintIcon from "@mui/icons-material/Fingerprint";
+import SmsOutlinedIcon from "@mui/icons-material/SmsOutlined";
 import { Alert, Box, Grid } from "@mui/material";
 import axios from "axios";
 import { Formik } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import LoadingButton from "../Button/LoadingButton";
-import FormikPhoneFieldCode from "../Formik/FormikPhoneFieldCode";
+import FormikNewPhoneNumber from "../Formik/FormikNewPhoneNumber";
 import FormikTextField from "../Formik/FormikTextField";
 
-const LoginUser = () => {
+const LoginUser = ({ onChildErrorPop }) => {
   const [error, getError] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otpValid, setOTP] = useState("");
   const [errorOtp, setErrorOtp] = useState(false);
+  const [errorPop, setErrorPop] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
   const navigate = useNavigate();
+
+  const handleFormData = (secondary, numericValue) => {
+    // Your logic for handling form data
+    console.log("Secondary:", secondary);
+    console.log("Numeric Value:", numericValue);
+    setPhoneNumber(secondary + numericValue);
+  };
+
+  useEffect(() => {
+    onChildErrorPop({ errorPop: errorPop, phoneNumber: phoneNumber });
+  }, [errorPop]);
 
   const initialValues = {
     phone: "",
   };
 
   const validationSchema = Yup.object().shape({
-    phone: Yup.string().label("User Id").required(),
+    phone: Yup.string().label("Phone Number").required(),
   });
 
   const checkPhoneNumberExits = async ({ values }) => {
@@ -40,7 +55,7 @@ const LoginUser = () => {
       const promises = filtersPhone.map((field) =>
         axios.get(
           `https://test-strapi.rytt.com/api/leads?filters[${field}][$eq]=${encodeURIComponent(
-            values.phone
+            phoneNumber
           )}`
         )
       );
@@ -62,6 +77,7 @@ const LoginUser = () => {
       }
 
       console.log("Phone number not found in any field.");
+      setErrorPop(true);
       return null;
     } catch (error) {
       console.error("Error while checking phone number:", error);
@@ -92,23 +108,19 @@ const LoginUser = () => {
 
         try {
           const response = await axios.post(
-            "https://live-server-2036.wati.io/api/v1/sendTemplateMessages",
+            "https://live-server-2036.wati.io/api/v1/sendTemplateMessage?whatsappNumber=" +
+              phoneNumber,
             {
               template_name: "login_otp",
               broadcast_name: "login_otp",
-              receivers: [
+              parameters: [
                 {
-                  whatsappNumber: values.phone,
-                  customParams: [
-                    {
-                      name: "reason",
-                      value: "login",
-                    },
-                    {
-                      name: "otp",
-                      value: otp,
-                    },
-                  ],
+                  name: "reason",
+                  value: "login",
+                },
+                {
+                  name: "otp",
+                  value: otp,
                 },
               ],
             },
@@ -120,6 +132,7 @@ const LoginUser = () => {
           );
           getError(false);
           setOtpSent(true);
+          setErrorPop(false);
           console.log("Response:", response.data);
         } catch (error) {
           console.error("Error:");
@@ -158,10 +171,10 @@ const LoginUser = () => {
             <form onSubmit={handleSubmit}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <FormikPhoneFieldCode
-                    type="number"
+                  <FormikNewPhoneNumber
                     label={"Mobile Number"}
                     name="phone"
+                    onFormData={handleFormData}
                   />
                 </Grid>
                 {otpSent && (
@@ -176,16 +189,21 @@ const LoginUser = () => {
                 )}
                 <Grid item xs={12}>
                   <LoadingButton
+                    startIcon={
+                      !otpSent ? <SmsOutlinedIcon /> : <FingerprintIcon />
+                    }
                     color="primary"
                     variant="contained"
-                    type="submit"
+                    fullWidth
                     isLoading={isSubmitting}
                     btnText={!otpSent ? "Send Otp" : "Verify"}
                     loadingText={!otpSent ? "Sending Otp" : "Verifying"}
+                    size="large"
+                    type="submit"
                   />
                 </Grid>{" "}
                 <Grid item xs={12}>
-                  {error && (
+                  {errorPop && (
                     <Alert severity="error">
                       Please Enter a Valid Phone Number
                     </Alert>
@@ -202,4 +220,5 @@ const LoginUser = () => {
     </>
   );
 };
+
 export default LoginUser;

@@ -7,10 +7,19 @@ export default function LoadingButton({
   loadingText,
   children,
   disabled,
+  color,
   ...props
 }) {
   return (
-    <Button {...props} disabled={isLoading || disabled}>
+    <Button
+      sx={{
+        boxShadow: "none",
+        ":hover": { boxShadow: "none" },
+      }}
+      {...props}
+      disabled={isLoading || disabled}
+      color={color}
+    >
       {isLoading ? (
         <Grid container alignItems="center" justifyContent="center">
           {loadingText}{" "}
