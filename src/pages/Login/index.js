@@ -14,8 +14,6 @@ const Login = () => {
     setPhoneNumber(phoneNumber);
   };
 
-  console.log(phoneNumber + "dsdasd");
-
   return (
     <>
       <Box sx={{ background: "#26dd8026" }}>

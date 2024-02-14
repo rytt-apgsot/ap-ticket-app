@@ -21,7 +21,7 @@ const ListCase = () => {
     try {
       axios
         .get(
-          `https://test-strapi.rytt.com/api/cases?populate=*&filters[leads][id][$eq]=${userData?.[0]?.id}&sort=createdAt:desc`
+          `https://strapi.rytt.com/api/cases?populate=*&filters[lead][id][$eq]=${userData?.[0]?.id}&sort=createdAt:desc`
         )
         .then(function (response) {
           setListCase(response?.data?.data);
@@ -54,7 +54,7 @@ const ListCase = () => {
             <CircularProgress color="inherit" />
           </Backdrop>
         ) : (
-          listCase.map((data, index) => (
+          listCase?.map((data, index) => (
             <Card
               key={index}
               sx={{ padding: "15px", marginTop: "20px", boxShadow: "none" }}
@@ -72,6 +72,7 @@ const ListCase = () => {
                   </Box>
                 </Grid>
                 <Grid item xs={1}>
+                  <Box sx={{ display: "flex", justifyContent: "center" }}></Box>
                   <ChatDetail data={data.id} />
                 </Grid>
               </Grid>

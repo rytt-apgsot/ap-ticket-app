@@ -97,7 +97,6 @@ export default function CreateCase({ formData }) {
   };
 
   const onSubmit = async (values, { setSubmitting }) => {
-    console.log(values);
     const now = new Date();
     const isoString = now.toISOString();
 
@@ -107,10 +106,12 @@ export default function CreateCase({ formData }) {
       formData.append("files", file);
     });
 
+    console.log(values);
+
     try {
       if (values.file) {
         const response = await axios.post(
-          "https://test-strapi.rytt.com/api/upload",
+          "https://strapi.rytt.com/api/upload",
           formData,
           {
             headers: {
@@ -119,12 +120,10 @@ export default function CreateCase({ formData }) {
           }
         );
 
-        console.log("Upload successful:", response.data);
-
         if (response.data) {
           try {
             await axios
-              .post(`https://test-strapi.rytt.com/api/cases`, {
+              .post(`https://strapi.rytt.com/api/cases`, {
                 data: {
                   ...values,
                   Subject: values.issue_type + "-queries",
@@ -135,7 +134,7 @@ export default function CreateCase({ formData }) {
                 },
               })
               .then(function (responseCase) {
-                axios.post(`https://test-strapi.rytt.com/api/chat-finals`, {
+                axios.post(`https://strapi.rytt.com/api/chat-finals`, {
                   data: {
                     lead: [
                       {
@@ -158,7 +157,6 @@ export default function CreateCase({ formData }) {
                   },
                 });
               });
-            console.log("Response:", response.data);
             handleClose();
           } catch (error) {
             console.log(error);
@@ -169,7 +167,7 @@ export default function CreateCase({ formData }) {
       } else {
         try {
           await axios
-            .post(`https://test-strapi.rytt.com/api/cases`, {
+            .post(`https://strapi.rytt.com/api/cases`, {
               data: {
                 ...values,
                 Subject: values.issue_type + "-queries",
@@ -181,7 +179,7 @@ export default function CreateCase({ formData }) {
               },
             })
             .then(function (responseCase) {
-              axios.post(`https://test-strapi.rytt.com/api/chat-finals`, {
+              axios.post(`https://strapi.rytt.com/api/chat-finals`, {
                 data: {
                   lead: [
                     {
@@ -201,7 +199,6 @@ export default function CreateCase({ formData }) {
                 },
               });
             });
-          console.log("Response: Successfuly");
           handleClose();
         } catch (error) {
           console.log(error);

@@ -69,7 +69,6 @@ const SignupUser = ({ phoneNumber }) => {
         getError(false);
         setOtpSent(true);
         setErrorPop(false);
-        console.log("Response:", response.data);
       } catch (error) {
         console.error("Error:");
       }
@@ -80,7 +79,7 @@ const SignupUser = ({ phoneNumber }) => {
       if (validate) {
         try {
           await axios
-            .post(`https://test-strapi.rytt.com/api/free-leads`, {
+            .post(`https://strapi.rytt.com/api/free-leads`, {
               data: {
                 Name: values.first_name + " " + values.last_name,
                 Email_id: values.email,
@@ -90,22 +89,16 @@ const SignupUser = ({ phoneNumber }) => {
               },
             })
             .then(function (responseCase) {
-              console.log("Response:", responseCase);
               // const stringifiedData = JSON.stringify(responseCase.data);
-
               // localStorage.setItem("user_student", stringifiedData);
               // navigate("/home");
             });
         } catch (error) {
           console.log(error);
         }
-
-        console.log("Login");
       } else {
         setErrorOtp(true);
       }
-
-      console.log(validate);
     }
   };
 

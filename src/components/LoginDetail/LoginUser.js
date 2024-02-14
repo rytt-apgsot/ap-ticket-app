@@ -21,8 +21,6 @@ const LoginUser = ({ onChildErrorPop }) => {
 
   const handleFormData = (secondary, numericValue) => {
     // Your logic for handling form data
-    console.log("Secondary:", secondary);
-    console.log("Numeric Value:", numericValue);
     setPhoneNumber(secondary + numericValue);
   };
 
@@ -54,9 +52,9 @@ const LoginUser = ({ onChildErrorPop }) => {
       // Create an array of promises for each field
       const promises = filtersPhone.map((field) =>
         axios.get(
-          `https://test-strapi.rytt.com/api/leads?filters[${field}][$eq]=${encodeURIComponent(
+          `https://strapi.rytt.com/api/leads?filters[${field}][$eq]=${encodeURIComponent(
             phoneNumber
-          )}`
+          )}&populate=batches`
         )
       );
 
@@ -71,12 +69,10 @@ const LoginUser = ({ onChildErrorPop }) => {
           response.data.data.length > 0
         ) {
           const enrollmentData = response.data.data;
-          console.log("Enrollment Data:", enrollmentData);
           return enrollmentData;
         }
       }
 
-      console.log("Phone number not found in any field.");
       setErrorPop(true);
       return null;
     } catch (error) {
@@ -97,11 +93,25 @@ const LoginUser = ({ onChildErrorPop }) => {
 
     const enrollmentData = await checkPhoneNumberExits({ values });
 
-    console.log(enrollmentData);
-
     if (!otpSent) {
       if (enrollmentData.length > 0) {
-        console.log("Enrollment data found:", enrollmentData);
+        console.log(enrollmentData);
+
+        try {
+          await axios.post(
+            "https://88df-2401-4900-1c20-6a8-f0a-a6c0-96a1-176b.ngrok-free.app/api/admin/course/enrollment/create",
+            {
+              name: enrollmentData[0]?.attributes?.name,
+              email: enrollmentData[0]?.attributes?.email,
+              phone: enrollmentData[0]?.attributes?.mobile_number,
+              batch: enrollmentData[0]?.attributes?.batches?.data.map(
+                (data) => data?.attributes?.batch_id
+              ),
+            }
+          );
+        } catch (error) {
+          console.log(error);
+        }
 
         const token =
           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiYmZkN2M0NS1jOWZjLTRkNGItYTE1MS0zZjg3NGFhNzJhZjYiLCJ1bmlxdWVfbmFtZSI6ImFzbWl0YXBhdGVsLmFwZ3NvdEBnbWFpbC5jb20iLCJuYW1laWQiOiJhc21pdGFwYXRlbC5hcGdzb3RAZ21haWwuY29tIiwiZW1haWwiOiJhc21pdGFwYXRlbC5hcGdzb3RAZ21haWwuY29tIiwiYXV0aF90aW1lIjoiMTIvMTYvMjAyMyAxMjo1NjozOSIsImRiX25hbWUiOiIyMDM2IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQURNSU5JU1RSQVRPUiIsImV4cCI6MjUzNDAyMzAwODAwLCJpc3MiOiJDbGFyZV9BSSIsImF1ZCI6IkNsYXJlX0FJIn0.dZhwhzMkSKVgEilr2wC6mTrPldFeMRCgO1dqRZFFk0o"; // Replace with your actual bearer token
@@ -133,12 +143,10 @@ const LoginUser = ({ onChildErrorPop }) => {
           getError(false);
           setOtpSent(true);
           setErrorPop(false);
-          console.log("Response:", response.data);
         } catch (error) {
           console.error("Error:");
         }
       } else {
-        console.log("Enrollment data not found.");
         getError(true);
       }
     } else {
@@ -149,13 +157,9 @@ const LoginUser = ({ onChildErrorPop }) => {
 
         localStorage.setItem("user_student", stringifiedData);
         navigate("/home");
-
-        console.log("Login");
       } else {
         setErrorOtp(true);
       }
-
-      console.log(validate);
     }
   };
 

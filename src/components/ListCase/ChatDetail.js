@@ -61,7 +61,7 @@ export default function ChatDetail({ data }) {
     try {
       axios
         .get(
-          `https://test-strapi.rytt.com/api/chat-finals?populate=*,messages.media_file,lead,users_permissions_user,case&filters[case][id][$eq]=${data}`
+          `https://strapi.rytt.com/api/chat-finals?populate=*,messages.media_file,lead,users_permissions_user,case&filters[case][id][$eq]=${data}`
         )
         .then(function (response) {
           setListChat(response?.data?.data);
@@ -83,8 +83,6 @@ export default function ChatDetail({ data }) {
     return () => clearInterval(intervalId);
   }, [data]);
 
-  // console.log(listChat?.[0]?.attributes?.messages);
-
   const modifiedArray = listChat?.[0]?.attributes?.messages?.map((item) => ({
     ...item,
     media_file:
@@ -93,15 +91,12 @@ export default function ChatDetail({ data }) {
       })) || [],
   }));
 
-  console.log(modifiedArray);
-
   const onSubmit = async (values, { resetForm }) => {
-    console.log(values);
     const now = new Date();
     const isoString = now.toISOString();
 
     axios.put(
-      `https://test-strapi.rytt.com/api/chat-finals/${listChat[0]?.id}`,
+      `https://strapi.rytt.com.rytt.com/api/chat-finals/${listChat[0]?.id}`,
       {
         data: {
           messages: [
@@ -201,8 +196,7 @@ export default function ChatDetail({ data }) {
                             component="img"
                             sx={{ width: 151 }}
                             image={
-                              "https://test-strapi.rytt.com" +
-                              data?.attributes?.url
+                              "https://strapi.rytt.com" + data?.attributes?.url
                             }
                             alt={data?.attributes?.name}
                             onClick={() => handleOpen(data?.attributes?.url)}
@@ -211,7 +205,7 @@ export default function ChatDetail({ data }) {
                             <img
                               src={
                                 selectedImageId
-                                  ? `https://test-strapi.rytt.com${selectedImageId}`
+                                  ? `https://strapi.rytt.com${selectedImageId}`
                                   : ""
                               }
                               alt="Full size"
@@ -265,8 +259,7 @@ export default function ChatDetail({ data }) {
                             component="img"
                             sx={{ width: 151 }}
                             image={
-                              "https://test-strapi.rytt.com" +
-                              data?.attributes?.url
+                              "https://strapi.rytt.com" + data?.attributes?.url
                             }
                             alt={data?.attributes?.name}
                             onClick={() => handleOpen(data?.attributes?.url)}
@@ -275,7 +268,7 @@ export default function ChatDetail({ data }) {
                             <img
                               src={
                                 selectedImageId
-                                  ? `https://test-strapi.rytt.com${selectedImageId}`
+                                  ? `https://strapi.rytt.com${selectedImageId}`
                                   : ""
                               }
                               alt="Full size"

@@ -5,11 +5,7 @@ const YourComponent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(e.target.files);
-
     const formData = new FormData(e.target);
-
-    console.log(formData);
 
     try {
       const response = await axios.post(
@@ -21,8 +17,6 @@ const YourComponent = () => {
           },
         }
       );
-
-      console.log("Upload successful:", response.data);
     } catch (error) {
       console.error("Upload failed:", error);
     }
